@@ -1,0 +1,1096 @@
+<!doctype html>
+<html lang="en" data-ov="ui-sophisticated"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>HawkCalls — Vocal Auto-Tune, Loop Pads, MIDI Synth & Light-Show Studio (forefronthawk.com)</title>
+<style>
+:root{--bg:#E8EBF0;--panel:#F8FAFC;--line:#CBD5E1;--text:#0F172A;--mute:#475569;--plate:#8B93A3;--accent:#0284C7;--d1:#CBD5E1;--d2:#94A3B8;--db:#64748B;--font:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;--mono:ui-monospace,Menlo,Consolas,monospace;color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media(prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#07090E;--panel:#12141A;--line:#262A34;--text:#F1F5F9;--mute:#94A3B8;--plate:#4B505C;--accent:#38BDF8;--d1:#1A1C23;--d2:#101216;--db:#2D323E;color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#07090E;--panel:#12141A;--line:#262A34;--text:#F1F5F9;--mute:#94A3B8;--plate:#4B505C;--accent:#38BDF8;--d1:#1A1C23;--d2:#101216;--db:#2D323E;color-scheme:dark}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+*{box-sizing:border-box}[hidden]{display:none!important}
+body{margin:0 auto;max-width:1100px;padding:10px;background:var(--bg);color:var(--text);font:500 13.5px/1.4 var(--font);display:flex;flex-direction:column;gap:10px}
+button,select,input{font:inherit;color:var(--text);background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:5px 9px;min-height:35px;touch-action:manipulation;cursor:pointer}
+input[type=range]{padding:0;border:0;background:none;accent-color:var(--accent);min-height:auto;width:100%}
+button:focus-visible,input:focus-visible{outline:2px solid var(--accent);outline-offset:1px}
+button[aria-pressed=true]{background:var(--accent);color:#04121C;border-color:var(--accent)}
+.bar{display:flex;flex-wrap:wrap;align-items:center;gap:8px;background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:8px 10px}
+.logo{font:800 18px var(--font);letter-spacing:.01em;margin-right:6px}
+#bpm{width:68px;font-family:var(--mono)}#mv{width:90px}
+#scope{width:160px;height:36px;border-radius:8px;background:var(--bg);border:1px solid var(--line);margin-left:auto}
+#rm[aria-pressed=true],#rec.on,button.m[aria-pressed=true]{background:#E11D48;color:#fff;border-color:#FB7185}
+.seg{display:flex;gap:2px;background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:3px}
+.seg button{flex:1;border:0;min-height:30px;background:none;color:var(--mute);font-weight:700;border-radius:8px}
+.seg button[aria-pressed=true]{background:var(--accent);color:#04121C}
+main{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:10px;min-height:260px}
+main>section{overflow-x:auto}
+.row{display:grid;grid-template-columns:70px 28px repeat(16,1fr);gap:3px;align-items:center;margin-bottom:5px;min-width:620px}
+.row .nm{text-align:left;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;border-left:5px solid var(--k);padding:2px 6px;min-height:32px}
+.row .nm[aria-pressed=true]{background:var(--k);color:#04121C}
+.m{padding:0}
+.st{min-height:32px;padding:0;border-radius:6px}.st.b{background:var(--line)}
+.st.on{background:var(--k);border-color:var(--k);box-shadow:0 0 8px var(--k)}
+.st.ph{outline:2px solid var(--text);outline-offset:-2px}
+.tools{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin:8px 0}
+#rc,#wv{display:block;width:100%;min-width:560px;border-radius:10px;border:1px solid var(--line);touch-action:none}
+.knobs{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:8px 16px;margin-top:10px}
+.knobs label{display:flex;flex-direction:column;font-size:11.5px;color:var(--mute)}
+.knobs output{font:600 11px var(--mono);color:var(--text)}
+.empty{color:var(--mute);margin:6px 0}
+#exo audio{width:100%;margin-top:4px}
+.deck{display:flex;flex-direction:column;gap:8px;background:linear-gradient(145deg,var(--d1),var(--d2));border:3px solid var(--db);border-radius:22px;padding:10px}
+.deck .tools{margin:0;color:var(--text)}
+.plate{background:var(--plate);border:2px solid var(--db);border-radius:16px;padding:8px;box-shadow:inset 0 3px 10px rgba(0,0,0,.55)}
+#grid{display:grid;grid-template-columns:repeat(12,1fr);gap:5px}
+.key{display:flex;flex-direction:column;align-items:center;justify-content:space-between;height:62px;min-height:0;padding:3px 1px;border-radius:9px;background:linear-gradient(180deg,#fff,#E2E8F0);color:#0F172A;border:2px solid var(--k);box-shadow:0 0 8px var(--k);touch-action:none;user-select:none;-webkit-user-select:none}
+.key i{display:block;width:100%;height:30%;border-radius:4px;background:var(--k)}
+.key small{font:600 8.5px var(--mono);color:#64748B}
+.key.bk{background:#1E2028}.key.bk small{color:#94A3B8}
+.key.dn{background:var(--k);transform:translateY(2px)}.key.dn small{color:#000}
+
+:root{
+  --bg:#090B10;--panel:#121620;--line:#2A3040;--text:#F8FAFC;--mute:#94A3B8;--plate:#181D2A;--accent:#D4AF37;
+  --deck1:#161B26;--deck2:#0C0F17;--deck-border:#C5A059;--plate-border:#384152;
+  --font:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+  --mono:"JetBrains Mono",ui-monospace,Menlo,Consolas,monospace;
+  box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);color-scheme:dark
+}
+@media(prefers-color-scheme:light){:root[data-theme="auto"]{--bg:#E8EBF0;--panel:#F8FAFC;--line:#CBD5E1;--text:#0F172A;--mute:#475569;--plate:#8B93A3;--deck1:#CBD5E1;--deck2:#94A3B8;--deck-border:#64748B;color-scheme:light}}
+:root[data-theme="dark"]{--bg:#07090E;--panel:#12141A;--line:#262A34;--text:#F1F5F9;--mute:#94A3B8;--plate:#4B505C;--deck1:#1A1C23;--deck2:#101216;--deck-border:#2D323E}
+:root[data-theme="light"]{--bg:#E8EBF0;--panel:#F8FAFC;--line:#CBD5E1;--text:#0F172A;--mute:#475569;--plate:#8B93A3;--deck1:#CBD5E1;--deck2:#94A3B8;--deck-border:#64748B;color-scheme:light}
+:root[data-theme="matrix"]{--bg:#010902;--panel:#031606;--line:#00FF41;--text:#00FF41;--mute:#15803D;--plate:#042409;--accent:#00FF41;--deck1:#031A07;--deck2:#010802;--deck-border:#00FF41}
+:root[data-theme="midnight"]{--bg:#020617;--panel:#0F172A;--line:#1E293B;--text:#E2E8F0;--mute:#64748B;--plate:#1E293B;--deck1:#0F172A;--deck2:#020617;--deck-border:#334155}
+:root[data-theme="cyberpunk"]{--bg:#0D0221;--panel:#19053B;--line:#4C1D95;--text:#F0ABFC;--mute:#C084FC;--plate:#2E1065;--deck1:#240046;--deck2:#10002B;--deck-border:#7E22CE}
+:root[data-theme="emerald"]{--bg:#021612;--panel:#062821;--line:#0F4C3E;--text:#D1FAE5;--mute:#6EE7B7;--plate:#114237;--deck1:#06342B;--deck2:#021B16;--deck-border:#059669}
+:root[data-theme="crimson"]{--bg:#160408;--panel:#280911;--line:#501322;--text:#FFE4E6;--mute:#FDA4AF;--plate:#3F101C;--deck1:#310B15;--deck2:#190409;--deck-border:#BE123C}
+:root[data-theme="nord"]{--bg:#2E3440;--panel:#3B4252;--line:#4C566A;--text:#ECEFF4;--mute:#D8DEE9;--plate:#434C5E;--deck1:#3B4252;--deck2:#2E3440;--deck-border:#4C566A}
+:root[data-theme="solarlight"]{--bg:#FDF6E3;--panel:#EEE8D5;--line:#D3CBB7;--text:#073642;--mute:#586E75;--plate:#93A1A1;--deck1:#E1DBCA;--deck2:#D3CBB7;--deck-border:#93A1A1;color-scheme:light}
+:root[data-theme="solardark"]{--bg:#002B36;--panel:#073642;--line:#2AA198;--text:#93A1A1;--mute:#657B83;--plate:#0A4452;--deck1:#073642;--deck2:#00212B;--deck-border:#586E75}
+:root[data-theme="mocha"]{--bg:#1E1E2E;--panel:#181825;--line:#313244;--text:#CDD6F4;--mute:#A6ADC8;--plate:#45475A;--deck1:#26273B;--deck2:#11111B;--deck-border:#585B70}
+:root[data-theme="contrast"]{--bg:#000000;--panel:#0A0A0A;--line:#FFFFFF;--text:#FFFFFF;--mute:#E2E8F0;--plate:#1F1F1F;--deck1:#0A0A0A;--deck2:#000000;--deck-border:#FFFFFF}
+
+/* Core Overlays (Sophisticated ForefrontHawk Default, Tech, Futuristic, Classic & 20 Hardware/OS Skins) */
+[data-ov="ui-sophisticated"]{--bg:#090B10;--panel:#121620;--line:#2A3040;--text:#F8FAFC;--mute:#94A3B8;--plate:#181D2A;--accent:#D4AF37;--deck1:#161B26;--deck2:#0C0F17;--deck-border:#C5A059}
+[data-ov="ui-sophisticated"] .bar{background:linear-gradient(180deg,rgba(22,27,38,0.96),rgba(14,17,24,0.98))!important;border:1px solid rgba(212,175,55,0.35)!important}
+[data-ov="ui-sophisticated"] .deck{border:2px solid #C5A059!important;box-shadow:0 18px 45px rgba(0,0,0,0.85)!important}
+[data-ov="ui-tech"]{--bg:#040B14;--panel:#071524;--line:#0EA5E9;--text:#E0F2FE;--mute:#38BDF8;--plate:#081C30;--accent:#00F5D4;--deck1:#07192B;--deck2:#030C16;--deck-border:#0EA5E9;--font:"JetBrains Mono",monospace}
+[data-ov="ui-tech"] .bar,[data-ov="ui-tech"] .deck{border-radius:3px!important;border-color:#0EA5E9!important}
+[data-ov="ui-futuristic"]{--bg:#060414;--panel:#110B29;--line:#8B5CF6;--text:#F3E8FF;--mute:#C4B5FD;--plate:#170F36;--accent:#00F0FF;--deck1:#19103B;--deck2:#09051A;--deck-border:#00F0FF}
+[data-ov="ui-futuristic"] .bar,[data-ov="ui-futuristic"] .deck{border-radius:18px!important;border-color:#00F0FF!important;box-shadow:0 0 24px rgba(139,92,246,0.3)!important}
+[data-ov="os-win95"] .bar,[data-ov="os-win95"] .deck{background:#C0C0C0!important;color:#000!important;border:2px outset #FFF!important;border-radius:0!important}
+[data-ov="os-winxp"] .bar,[data-ov="os-winxp"] .deck{background:linear-gradient(180deg,#245EDB,#1941A5)!important;color:#FFF!important;border:2px solid #003399!important}
+[data-ov="os-pipboy"] .bar,[data-ov="os-pipboy"] .deck{background:#051405!important;color:#1AFF40!important;border:2px solid #1AFF40!important}
+[data-ov="app-winamp"] .bar,[data-ov="app-winamp"] .deck{background:#292938!important;color:#00FF00!important;border:2px ridge #6E738B!important;border-radius:0!important}
+
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent;-webkit-user-select:none;user-select:none}
+[hidden]{display:none!important}
+body{margin:0;background:var(--bg);color:var(--text);font:500 13px/1.4 var(--font);min-height:100vh;overflow-x:hidden;transition:background-color .18s,color .18s}
+.wrap{max-width:1240px;margin:0 auto;padding:8px 10px;display:flex;flex-direction:column;gap:8px}
+.bar{display:flex;flex-wrap:wrap;align-items:center;gap:7px;background:var(--panel);border:1px solid var(--line);border-radius:13px;padding:7px 10px}
+button,select,input{font:inherit;color:var(--text);background:var(--panel);border:1px solid var(--line);border-radius:9px;padding:4px 8px;min-height:32px;cursor:pointer}
+button:hover{filter:brightness(1.14)}
+input[type=range]{padding:0;border:0;background:none;accent-color:var(--accent);min-height:auto}
+input[type=color]{padding:1px;width:36px;height:30px;min-height:30px}
+.brand{font-weight:800;font-size:15.5px;display:flex;align-items:center;gap:6px}.brand i{font-style:normal;color:var(--accent)}
+.chip{font:600 11px var(--mono);padding:3px 8px;border-radius:7px;border:1px solid var(--line);color:var(--mute)}
+.seg{display:flex;flex-wrap:wrap;gap:2px;border:1px solid var(--line);border-radius:10px;padding:2px}
+.seg button,.seg a.nav-pill{display:inline-flex;align-items:center;justify-content:center;text-decoration:none;border:0;min-height:26px;padding:2px 9px;background:none;color:var(--mute);font-weight:700;font-size:11.5px;border-radius:7px;cursor:pointer}
+.seg button[aria-current="page"],.seg a.nav-pill[aria-current="page"]{background:var(--accent);color:#04121C}
+.deck{display:flex;flex-direction:column;gap:10px;background:linear-gradient(145deg,var(--deck1),var(--deck2));border:2px solid var(--deck-border);border-radius:18px;padding:12px}
+.subcard{background:rgba(0,0,0,0.2);border:1px solid var(--line);border-radius:10px;padding:7px 9px;width:100%;display:flex;flex-wrap:wrap;align-items:center;gap:7px}
+.subhead{font:800 10.5px var(--mono);text-transform:uppercase;color:var(--accent);letter-spacing:0.5px;margin-right:4px}
+.swatch-pill{display:inline-flex;align-items:center;gap:6px;padding:3px 9px;border-radius:8px;border:2px solid #fff;font:800 12px var(--mono);box-shadow:0 0 12px var(--active-c,#10B981)}
+
+/* Map HawkStudio --d1, --d2, --db variables to our shared --deck1, --deck2, --deck-border */
+:root {
+  --d1: var(--deck1, #161B26);
+  --d2: var(--deck2, #0C0F17);
+  --db: var(--deck-border, #C5A059);
+}
+body { max-width: 1240px; }
+.loop-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(115px, 1fr));
+  gap: 8px;
+  margin-top: 8px;
+}
+.loop-pad {
+  border: 2px solid var(--k, var(--accent));
+  border-radius: 11px;
+  padding: 8px 6px;
+  background: rgba(15, 23, 42, 0.75);
+  color: var(--text);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: space-between;
+  gap: 4px;
+  min-height: 68px;
+  box-shadow: 0 0 10px var(--k, transparent);
+}
+.loop-pad.active-loop {
+  background: var(--k, var(--accent));
+  color: #04121C;
+  font-weight: 800;
+  animation: pulseLoop 0.7s infinite alternate;
+}
+@keyframes pulseLoop {
+  from { transform: scale(0.98); filter: brightness(0.95); }
+  to { transform: scale(1.03); filter: brightness(1.2); }
+}
+.key.loop-mode-key {
+  height: 68px;
+}
+.key.loop-playing {
+  outline: 3px solid #FFF;
+  animation: pulseLoop 0.5s infinite alternate;
+}
+
+</style></head>
+<body>
+
+  <!-- SHARED FOREFRONTHAWK.COM 5-APP TOP SUBDOMAIN BANNER & CUSTOMIZER -->
+  <header class="bar" style="justify-content:space-between">
+    <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
+      <a href="https://forefronthawk.com" class="brand" style="text-decoration:none;color:var(--text)">🦅 Forefront<i>Hawk</i></a>
+      <span class="chip">HawkCalls Studio (HawkStudio)</span>
+      <nav class="seg" id="suiteNavSeg" aria-label="ForefrontHawk Subdomain Navigation">
+        <a href="https://chroma.forefronthawk.com" data-sub="https://chroma.forefronthawk.com" class="sub-link nav-pill" >🎹 Chroma</a>
+        <a href="https://draw.forefronthawk.com" data-sub="https://draw.forefronthawk.com" class="sub-link nav-pill" >💡 HawkDraw</a>
+        <a href="https://shine.forefronthawk.com" data-sub="https://shine.forefronthawk.com" class="sub-link nav-pill" >⚡ HawkShine</a>
+        <a href="https://rgb.forefronthawk.com" data-sub="https://rgb.forefronthawk.com" class="sub-link nav-pill" >🎞️ HawkRGB</a>
+        <a href="https://calls.forefronthawk.com" data-sub="https://calls.forefronthawk.com" class="sub-link nav-pill" aria-current="page">🎙️ HawkCalls</a>
+      </nav>
+    </div>
+    <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap">
+      <button id="openChromaPopupBtn" type="button" class="chip" style="cursor:pointer;border-color:var(--accent);color:var(--accent)" title="Open chroma.forefronthawk.com in a linked companion window">🪟 Pair Chroma Window</button>
+      <span id="chromaLiveSwatch" class="swatch-pill" style="background:#10B981;color:#080B10">#10B981 (GRN)</span>
+      <button id="toggleSharedCustBtn" type="button">🛠️ UI &amp; Skin</button>
+    </div>
+  </header>
+
+  <section id="sharedCustPanel" class="bar" hidden>
+    <div class="subcard">
+      <span class="subhead">Shared forefronthawk.com UI (Travels Across All 5 Sites)</span>
+      <label>🎛️ Overlay <select id="sharedOverlaySel"></select></label>
+      <label>UI Theme
+        <select id="sharedThemeSel">
+          <option value="dark">Obsidian Dark</option>
+          <option value="light">Studio Daylight</option>
+          <option value="matrix">Matrix Digital Code</option>
+          <option value="midnight">Midnight OLED</option>
+          <option value="cyberpunk">Cyberpunk Neon</option>
+          <option value="emerald">Emerald Matrix</option>
+          <option value="crimson">Crimson Forged</option>
+          <option value="nord">Nordic Frost</option>
+          <option value="solarlight">Solarized Light</option>
+          <option value="solardark">Solarized Dark</option>
+          <option value="mocha">Catppuccin Mocha</option>
+          <option value="contrast">High-Contrast Pro</option>
+          <option value="custom_live">★ Custom Colors</option>
+        </select>
+      </label>
+      <label>Font
+        <select id="sharedFontSel">
+          <option value="system">System Sans</option>
+          <option value="calibri">Calibri</option>
+          <option value="arial">Arial</option>
+          <option value="inter">Inter Studio</option>
+          <option value="serif">Serif</option>
+          <option value="mono">JetBrains Mono</option>
+          <option value="space">Space Grotesk</option>
+          <option value="orbitron">Orbitron Cyber</option>
+          <option value="pixel">8-Bit Pixel</option>
+        </select>
+      </label>
+      <label>BG <input type="color" id="cBgIn" value="#090B10"></label>
+      <label>Panel <input type="color" id="cPanelIn" value="#121620"></label>
+      <label>Text <input type="color" id="cTextIn" value="#F8FAFC"></label>
+    </div>
+  </section>
+
+<header class="bar">
+<span class="logo">🦅 Hawk<i style="font-style:normal;color:var(--accent)">Calls</i></span>
+<button id="pl" aria-label="Play or stop" aria-pressed="false">▶ Play</button>
+<button id="rm" aria-pressed="false" title="Record played notes into the pattern while it plays">● Notes</button>
+<button id="clickTrackBtn" aria-pressed="true" title="Metronome Click Track while playing or recording">⏱️ Click: On</button>
+<label>BPM <input id="bpm" type="number" min="60" max="200" value="120"></label>
+<label>Vol <input id="mv" type="range" min="0" max="1" step=".01" value=".8"></label>
+<button id="exp">Export beat</button>
+<button id="lightShowExpBtn" style="background:#059669;color:#fff;border-color:#10B981;font-weight:700" title="Save Song as 300-Frame Light-Show CSV for HawkRGB and HawkShine!">🎬 Save Light-Show (.csv)</button>
+<button id="beamLightShowBtn" style="background:#7C3AED;color:#fff;border-color:#A78BFA;font-weight:700" title="Beam Song Light-Show directly to open HawkRGB & HawkShine tabs!">📡 Beam to RGB/Shine</button>
+<canvas id="scope" width="160" height="36"></canvas>
+</header>
+<div id="exo"></div>
+<nav class="seg" id="tabs"><button data-t="rack" aria-pressed="true">Rack</button><button data-t="roll">Piano roll</button><button data-t="syn">Synth</button><button data-t="aud">Audio</button><button data-t="loops">🔁 Loops &amp; Song</button></nav>
+<main>
+<section id="rack"></section>
+<section id="roll" hidden><canvas id="rc" width="640" height="288"></canvas></section>
+<section id="syn" hidden></section>
+<section id="aud" hidden>
+<div class="tools"><button id="rec">● Record mic</button><button id="ap">▶ Play</button><button id="as">■ Stop</button><button id="imb">Import audio</button><input id="imp" type="file" accept="audio/*" hidden><span id="ast" class="empty" aria-live="polite">Record with the mic or import a file. Drag on the wave to select.</span></div>
+<canvas id="wv" width="640" height="170"></canvas>
+<div class="tools" id="ops"><button data-o="cut">Cut</button><button data-o="trim">Trim</button><button data-o="reverse">Reverse</button><button data-o="norm">Normalize</button><button data-o="fin">Fade in</button><button data-o="fout">Fade out</button><button id="und">Undo</button></div>
+<div class="tools"><button id="tor">Send to rack</button><button id="toLoopPadBtn" style="border-color:var(--accent);color:var(--accent);font-weight:700">🔁 Assign Clip to Chroma Loop Key</button><button id="aexp">Export clip</button></div>
+
+<!-- VOICE MODULATION & AUTO-TUNE DSP RACK -->
+<div class="subcard" style="margin-top:8px">
+  <span class="subhead">🎙️ Voice Modulation &amp; Auto-Tune Pitch Quantizer</span>
+  <button id="autoTuneToggleBtn" aria-pressed="true" style="font-weight:800">🎯 Auto-Tune: ON</button>
+  <label>Scale
+    <select id="atScaleSel" style="font-weight:700">
+      <option value="major" selected>Major (Ionian)</option>
+      <option value="minor">Natural Minor</option>
+      <option value="chromatic">Chromatic (12-Tone)</option>
+      <option value="pent-min">Minor Pentatonic</option>
+      <option value="blues">Blues Scale</option>
+      <option value="dorian">Dorian Mode</option>
+    </select>
+  </label>
+  <label>Root Key
+    <select id="atRootSel" style="font-weight:700">
+      <option value="0">C</option><option value="1">C#</option><option value="2">D</option><option value="3">D#</option>
+      <option value="4">E</option><option value="5">F</option><option value="6">F#</option><option value="7">G</option>
+      <option value="8">G#</option><option value="9">A</option><option value="10">A#</option><option value="11">B</option>
+    </select>
+  </label>
+  <label title="0% = Hard Robotic T-Pain Pitch Snap; 100% = Gentle Natural Correction">
+    Retune <input id="atSpeedIn" type="range" min="0" max="100" value="10" style="width:65px">
+  </label>
+  <label>Voice FX Preset
+    <select id="voiceFxPresetSel" style="font-weight:700;border-color:var(--accent)">
+      <option value="clean">Studio Clean Vocal</option>
+      <option value="autotune-hard">🤖 Hard Auto-Tune Lead</option>
+      <option value="hawk-cry">🦅 Hawk Cry Resonator</option>
+      <option value="vocoder">⚡ Cyber Robot Ring-Mod</option>
+      <option value="demon">👹 Deep Sub Bass (-5 st)</option>
+      <option value="chipmunk">🐿️ Helium Lead (+7 st)</option>
+      <option value="radio">📻 Walkie-Talkie Bandpass</option>
+    </select>
+  </label>
+  <label title="Pitch Shift (Semitones)">
+    Pitch <b id="vPitchLbl">0st</b>
+    <input id="vPitchIn" type="range" min="-12" max="12" value="0" style="width:65px">
+  </label>
+  <button id="applyVoiceDspBtn" style="background:var(--accent);color:#04121C;font-weight:800">✨ Process &amp; Apply Auto-Tune/FX to Clip</button>
+  <button id="genHawkCallSampleBtn" title="Generate a synthesized Hawk Call / Vocal Lead phrase to test Auto-Tune & Modulation immediately!">🦅 Gen Synth Vocal/Hawk Call</button>
+</div>
+</section>
+
+<!-- LOOPS & SONG ARRANGER SECTION -->
+<section id="loops" hidden>
+  <div class="subcard">
+    <span class="subhead">🔁 Chroma Loop Launcher &amp; Song Arranger</span>
+    <span style="font-size:12px;color:var(--mute)">Assign synth riffs, drum beats, or Auto-Tuned vocal clips to the 12/24 Chroma Keys below. Switch the bottom deck to <b>🔁 Play Loops on Keys</b> to jam and record a full song!</span>
+    <div style="margin-left:auto;display:flex;gap:6px;flex-wrap:wrap">
+      <button id="bakeRackToLoopBtn" style="border-color:var(--accent);color:var(--accent);font-weight:700">📥 Bounce Current Rack Beat to Loop Pad</button>
+      <button id="stopAllLoopsBtn" style="color:#FCA5A5;border-color:#EF4444">■ Stop All Loops</button>
+    </div>
+  </div>
+  <div id="loopPadsGrid" class="loop-grid"></div>
+  <div class="subcard" style="margin-top:10px">
+    <span class="subhead">🎼 Song Structure Timeline (Bars 1–8)</span>
+    <div id="songChainRow" style="display:flex;gap:6px;flex-wrap:wrap;align-items:center;flex:1"></div>
+    <button id="addSongSectionBtn">+ Add Bar to Song</button>
+    <button id="clearSongChainBtn">Reset Song</button>
+  </div>
+</section>
+</main>
+<div class="deck">
+  <div class="tools">
+    <div class="seg" id="deckKeyModeSeg" style="padding:2px">
+      <button type="button" data-km="midi" aria-pressed="true">🎹 MIDI Synth Keys</button>
+      <button type="button" data-km="loops" aria-pressed="false">🔁 Play Loops on Keys</button>
+    </div>
+    <button id="od">Octave −</button>
+    <button id="ou">Octave +</button>
+    <label style="font-size:12px;color:var(--mute)">Key Scale
+      <select id="deckScaleFilterSel">
+        <option value="chromatic">Chromatic (All Keys)</option>
+        <option value="major">Major Scale Lock</option>
+        <option value="minor">Minor Scale Lock</option>
+        <option value="pent-min">Pentatonic Lock</option>
+      </select>
+    </label>
+    <span id="midi" class="chip">Looking for MIDI…</span>
+    <span class="empty" style="margin-left:auto">Keys: Z–M &amp; Q–U • Tap keys to trigger notes/loops &amp; broadcast color!</span>
+  </div>
+  <div class="plate"><div id="grid"></div></div>
+</div>
+<script>
+const $=s=>document.querySelector(s),$$=s=>[...document.querySelectorAll(s)],css=n=>getComputedStyle(document.documentElement).getPropertyValue(n).trim();
+const NN=['C','C#','D','D#','E','F','F#','G','G#','A','A#','B'],BK=[1,3,6,8,10];
+const P={Lead:{w:'sawtooth',w2:'square',det:8,mix:.4,a:.01,d:.25,s:.6,r:.25,cut:3200,q:4,env:2000,lfo:5,ld:0,dl:.25,vol:.6},
+Pad:{w:'sawtooth',w2:'sawtooth',det:14,mix:.6,a:.5,d:.6,s:.7,r:1,cut:1400,q:1,env:600,lfo:.4,ld:300,dl:.3,vol:.5},
+Bass:{w:'sawtooth',w2:'square',det:0,mix:.5,a:.005,d:.25,s:.3,r:.1,cut:500,q:6,env:1800,lfo:.1,ld:0,dl:0,vol:.8},
+Pluck:{w:'triangle',w2:'sawtooth',det:5,mix:.3,a:.002,d:.18,s:0,r:.15,cut:2400,q:2,env:3000,lfo:.1,ld:0,dl:.3,vol:.7}};
+const KN=[['det','Detune',0,50,1],['mix','Osc 2 mix',0,1,.01],['a','Attack',.001,2,.001],['d','Decay',.02,2,.01],['s','Sustain',0,1,.01],['r','Release',.02,3,.01],['cut','Cutoff',80,12000,1],['q','Resonance',.1,18,.1],['env','Filter env',0,8000,10],['lfo','LFO rate',.1,12,.1],['ld','LFO to filter',0,3000,10],['dl','Echo',0,.8,.01],['vol','Volume',0,1,.01]];
+const D=a=>Object.fromEntries(a.map(j=>[j,60]));
+const mk=(n,k,pr,root,pat)=>{const s=Array.from({length:16},()=>[]);for(const j in pat)s[j]=[].concat(pat[j]);return{n,k,s,root,p:pr?{...P[pr]}:{vol:.8,dl:0}}};
+const chs=[mk('Kick','kick',0,60,D([0,4,8,12])),mk('Snare','snare',0,60,D([4,12])),mk('Hat','hat',0,60,D([2,6,10,14])),mk('Bass','syn','Bass',36,{0:36,3:36,6:39,8:34,11:34,14:41}),mk('Lead','syn','Lead',60,{2:67,6:70,10:72,12:70})];
+chs.forEach((c,i)=>c.h=190+i*55);
+let ci=4,oct=3,ctx,master,an,dly,nz,playing=0,step=0,nxt=0,tid,cur=-1,bpm=120,rm=0,tab='rack',buf,rg=null,hist=[],src,mr;const held={},ptr={};
+
+function init(){if(ctx)return;ctx=new(window.AudioContext||webkitAudioContext)();master=ctx.createGain();master.gain.value=+$('#mv').value;an=ctx.createAnalyser();master.connect(an);an.connect(ctx.destination);dly=ctx.createDelay(2);const fb=ctx.createGain();fb.gain.value=.38;dly.connect(fb);fb.connect(dly);dly.connect(master);setBpm();nz=ctx.createBuffer(1,ctx.sampleRate,ctx.sampleRate);const d=nz.getChannelData(0);for(let i=0;i<d.length;i++)d[i]=Math.random()*2-1}
+function setBpm(){bpm=Math.min(200,Math.max(60,+$('#bpm').value||120));if(dly)dly.delayTime.value=60/bpm*.75}
+function ensure(c){if(!c.out){c.out=ctx.createGain();c.snd=ctx.createGain();c.out.connect(master);c.out.connect(c.snd);c.snd.connect(dly)}c.out.gain.value=c.p.vol;c.snd.gain.value=c.p.dl}
+function voice(c,m,t,v){const o=c.p,f=440*2**((m-69)/12),g=ctx.createGain(),fl=ctx.createBiquadFilter();fl.type='lowpass';fl.Q.value=o.q;fl.frequency.setValueAtTime(Math.min(o.cut+o.env,18000),t);fl.frequency.setTargetAtTime(o.cut,t,o.d/3+.01);
+const os=[0,1].map(i=>{const x=ctx.createOscillator(),y=ctx.createGain();x.type=i?o.w2:o.w;x.frequency.value=f;x.detune.value=i?o.det:0;y.gain.value=i?o.mix:1-o.mix*.5;x.connect(y).connect(fl);x.start(t);return x});
+if(o.ld){const l=ctx.createOscillator(),lg=ctx.createGain();l.frequency.value=o.lfo;lg.gain.value=o.ld;l.connect(lg).connect(fl.frequency);l.start(t);os.push(l)}
+g.gain.setValueAtTime(0,t);g.gain.linearRampToValueAtTime(v*.5,t+o.a);g.gain.setTargetAtTime(v*.5*o.s,t+o.a,o.d/3+.001);fl.connect(g).connect(c.out);
+return e=>{const z=Math.max(e,t+o.a+.02);g.gain.cancelScheduledValues(z);g.gain.setTargetAtTime(0,z,o.r/3+.005);os.forEach(x=>x.stop(z+o.r*1.5+.1))}}
+function drum(c,t){const k=c.k,g=ctx.createGain();g.connect(c.out);if(k=='kick'){const o=ctx.createOscillator();o.frequency.setValueAtTime(160,t);o.frequency.exponentialRampToValueAtTime(42,t+.14);g.gain.setValueAtTime(1,t);g.gain.exponentialRampToValueAtTime(.001,t+.42);o.connect(g);o.start(t);o.stop(t+.45)}else{const s=ctx.createBufferSource(),f=ctx.createBiquadFilter(),h=k=='hat',d=h?.06:.2;s.buffer=nz;f.type=h?'highpass':'bandpass';f.frequency.value=h?7500:1900;g.gain.setValueAtTime(h?.5:.9,t);g.gain.exponentialRampToValueAtTime(.001,t+d);s.connect(f).connect(g);s.start(t);s.stop(t+d+.05)}}
+function trig(c,m,t,v){ensure(c);if(c.k=='syn')return voice(c,m,t,v);if(c.k=='smp'){const s=ctx.createBufferSource();s.buffer=c.buf;s.playbackRate.value=2**((m-60)/12);s.connect(c.out);s.start(t)}else drum(c,t);return()=>{}}
+
+var clickTrackOn = true;
+function playMetronomeTick(time, isDownbeat, isBeat){
+  if(!clickTrackOn || !isBeat) return;
+  try{
+    const osc = ctx.createOscillator(), g = ctx.createGain();
+    osc.type = "triangle";
+    osc.frequency.setValueAtTime(isDownbeat ? 1480 : 980, time);
+    osc.frequency.exponentialRampToValueAtTime(220, time + 0.035);
+    g.gain.setValueAtTime(isDownbeat ? 0.22 : 0.12, time);
+    g.gain.exponentialRampToValueAtTime(0.001, time + 0.04);
+    // Connect directly to ctx.destination so metronome click doesn't muddy exported master stem unless desired
+    osc.connect(g); g.connect(ctx.destination);
+    osc.start(time); osc.stop(time + 0.045);
+  }catch(e){}
+}
+
+function sched(){const sd=60/bpm/4;while(nxt<ctx.currentTime+.12){if(step%4===0)playMetronomeTick(nxt,step===0,true);chs.forEach(c=>{if(!c.mute)c.s[step].forEach(m=>trig(c,m,nxt,.8)(nxt+sd*.9))});const st=step;setTimeout(()=>{if(playing){cur=st;paint()}},Math.max(0,(nxt-ctx.currentTime)*1000));step=(step+1)%16;nxt+=sd}}
+function startSeq(){init();ctx.resume();if(playing)return;setBpm();playing=1;step=0;nxt=ctx.currentTime+.05;tid=setInterval(sched,25);$('#pl').setAttribute('aria-pressed',true);$('#pl').textContent='■ Stop'}
+function halt(){playing=0;clearInterval(tid);cur=-1;$('#pl').setAttribute('aria-pressed',false);$('#pl').textContent='▶ Play';paint()}
+function paint(){$$('.st').forEach(b=>b.classList.toggle('ph',+b.dataset.j==cur));if(tab=='roll')rRoll()}
+
+function rRack(){$('#rack').innerHTML=chs.map((c,i)=>`<div class="row" style="--k:hsl(${c.h} 80% 55%)"><button class="nm" data-i="${i}" aria-pressed="${i==ci}">${c.n}</button><button class="m" data-i="${i}" aria-pressed="${!!c.mute}" title="Mute">M</button>${c.s.map((p,j)=>`<button class="st${p.length?' on':''}${j>>2&1?' b':''}" data-i="${i}" data-j="${j}" aria-label="${c.n} step ${j+1}"></button>`).join('')}</div>`).join('')+'<div class="tools"><button id="adds">+ Synth</button><button id="clr">Clear pattern</button></div>'}
+function addSynth(){const c=mk('Synth '+(chs.length-3),'syn','Pad',60,{});c.h=(190+chs.length*55)%360;chs.push(c);ci=chs.length-1;rRack()}
+$('#rack').onclick=e=>{const b=e.target.closest('button');if(!b)return;if(b.id=='adds')return addSynth();if(b.id=='clr'){chs.forEach(c=>c.s=c.s.map(()=>[]));return rRack()}const i=+b.dataset.i,c=chs[i];if(b.classList.contains('nm')){ci=i;rRack()}else if(b.classList.contains('m')){c.mute=!c.mute;b.setAttribute('aria-pressed',!!c.mute)}else{const j=+b.dataset.j;if(c.s[j].length)c.s[j]=[];else{c.s[j]=[c.root];init();ctx.resume();trig(c,c.root,ctx.currentTime,.8)(ctx.currentTime+.2)}b.classList.toggle('on',c.s[j].length>0)}};
+
+function rRoll(){const cv=$('#rc'),x=cv.getContext('2d'),c=chs[ci];x.clearRect(0,0,640,288);for(let r=0;r<24;r++){const m=71-r;x.fillStyle=css(BK.includes(m%12)?'--bg':'--panel');x.fillRect(0,r*12,640,12);if(m%12==0){x.fillStyle=css('--mute');x.font='9px monospace';x.fillText('C'+(m/12-1),2,r*12+10)}}
+x.strokeStyle=css('--line');x.lineWidth=1;for(let i=0;i<=16;i++){x.beginPath();x.moveTo(i*40+.5,0);x.lineTo(i*40+.5,288);x.stroke()}for(let r=0;r<=24;r++){x.beginPath();x.moveTo(0,r*12+.5);x.lineTo(640,r*12+.5);x.stroke()}
+if(cur>=0){x.fillStyle=css('--accent')+'33';x.fillRect(cur*40,0,40,288)}x.fillStyle=`hsl(${c.h} 80% 55%)`;c.s.forEach((p,j)=>p.forEach(m=>{if(m>=48&&m<=71)x.fillRect(j*40+1,(71-m)*12+1,38,10)}))}
+$('#rc').onpointerdown=e=>{const r=e.target.getBoundingClientRect(),j=Math.floor((e.clientX-r.left)/r.width*16),m=71-Math.floor((e.clientY-r.top)/r.height*24),c=chs[ci],k=c.s[j].indexOf(m);if(k>=0)c.s[j].splice(k,1);else{c.s[j].push(m);init();ctx.resume();trig(c,m,ctx.currentTime,.8)(ctx.currentTime+.2)}rRoll()};
+
+function rSyn(){const c=chs[ci],el=$('#syn');if(c.k!='syn'){el.innerHTML=`<p class="empty">${c.n} is not a synth. Pick a synth channel in the rack, or add one.</p><button id="adds2">+ Synth</button>`;return}
+const o=c.p,W=[['sine','Sine'],['square','Square'],['sawtooth','Saw'],['triangle','Tri']],sg=(k,l)=>`<div><span class="empty">${l}</span><div class="seg">${W.map(w=>`<button data-w="${k}" data-v="${w[0]}" aria-pressed="${o[k]==w[0]}">${w[1]}</button>`).join('')}</div></div>`;
+el.innerHTML=`<div class="tools"><b>${c.n}</b>${Object.keys(P).map(n=>`<button data-pr="${n}">${n}</button>`).join('')}</div><div class="tools">${sg('w','Osc 1')}${sg('w2','Osc 2')}</div><div class="knobs">${KN.map(k=>`<label>${k[1]} <output>${o[k[0]]}</output><input type="range" data-k="${k[0]}" min="${k[2]}" max="${k[3]}" step="${k[4]}" value="${o[k[0]]}"></label>`).join('')}</div><p class="empty">Play the keys below to hear changes.</p>`}
+$('#syn').onclick=e=>{const b=e.target.closest('button');if(!b)return;const c=chs[ci];if(b.id=='adds2'){addSynth();return rSyn()}if(b.dataset.pr){c.p={...P[b.dataset.pr]};if(c.out)ensure(c)}else if(b.dataset.w)c.p[b.dataset.w]=b.dataset.v;rSyn()};
+$('#syn').oninput=e=>{const k=e.target.dataset.k;if(!k)return;const c=chs[ci];c.p[k]=+e.target.value;e.target.previousElementSibling.textContent=e.target.value;if(c.out)ensure(c)};
+
+function msg(t){$('#ast').textContent=t}
+function wave(){const x=$('#wv').getContext('2d'),W=640,H=170;x.fillStyle=css('--bg');x.fillRect(0,0,W,H);if(!buf){return}const d=buf.getChannelData(0),n=d.length;x.fillStyle=css('--accent');for(let i=0;i<W;i++){let mn=1,mx=-1;const a=Math.floor(i/W*n),b=Math.floor((i+1)/W*n);for(let j=a;j<b;j+=Math.max(1,(b-a)>>6)){const v=d[j];if(v<mn)mn=v;if(v>mx)mx=v}x.fillRect(i,(1-mx)*H/2,1,Math.max(1,(mx-mn)*H/2))}if(rg){x.fillStyle=css('--accent')+'55';x.fillRect(rg[0]*W,0,(rg[1]-rg[0])*W,H)}if(!mr||mr.state!='recording')msg(`${(n/buf.sampleRate).toFixed(2)} s${rg?', selection '+((rg[1]-rg[0])*n/buf.sampleRate).toFixed(2)+' s':''}`)}
+const wv=$('#wv');let a0=null;const fx=e=>{const r=wv.getBoundingClientRect();return Math.max(0,Math.min(1,(e.clientX-r.left)/r.width))};
+wv.onpointerdown=e=>{a0=fx(e);wv.setPointerCapture(e.pointerId);rg=null;wave()};wv.onpointermove=e=>{if(a0==null)return;const x=fx(e);rg=Math.abs(x-a0)>.004?[Math.min(a0,x),Math.max(a0,x)]:null;wave()};wv.onpointerup=()=>a0=null;
+const range=()=>{const n=buf.length;return rg?[Math.floor(rg[0]*n),Math.floor(rg[1]*n)]:[0,n]};
+const cd=b=>Array.from({length:b.numberOfChannels},(_,i)=>b.getChannelData(i));
+const OPS={cut:(d,a,z)=>d.map(x=>{const o=new Float32Array(x.length-(z-a));o.set(x.subarray(0,a));o.set(x.subarray(z),a);return o}),trim:(d,a,z)=>d.map(x=>x.slice(a,z)),reverse:(d,a,z)=>{d.forEach(x=>x.subarray(a,z).reverse());return d},
+norm:(d,a,z)=>{let p=1e-4;d.forEach(x=>{for(let i=a;i<z;i++)p=Math.max(p,Math.abs(x[i]))});d.forEach(x=>{for(let i=a;i<z;i++)x[i]*=.97/p});return d},fin:(d,a,z)=>{d.forEach(x=>{for(let i=a;i<z;i++)x[i]*=(i-a)/(z-a)});return d},fout:(d,a,z)=>{d.forEach(x=>{for(let i=a;i<z;i++)x[i]*=(z-i)/(z-a)});return d}};
+function edit(k){if(!buf||(k=='cut'&&!rg))return;const[a,z]=range(),o=OPS[k](cd(buf).map(x=>x.slice()),a,z);if(!o[0].length)return;hist.push(buf);const nb=ctx.createBuffer(o.length,o[0].length,buf.sampleRate);o.forEach((x,i)=>nb.copyToChannel(x,i));buf=nb;rg=null;wave()}
+$('#ops').onclick=e=>{const b=e.target.closest('button');if(!b)return;if(b.id=='und'){if(hist.length){buf=hist.pop();rg=null;wave()}}else edit(b.dataset.o)};
+function stopClip(){try{src&&src.stop()}catch(e){}}
+function playClip(){if(!buf)return;init();ctx.resume();stopClip();const[a,z]=range(),s=ctx.createBufferSource();s.buffer=buf;s.connect(master);s.start(0,a/buf.sampleRate,(z-a)/buf.sampleRate);src=s}
+$('#ap').onclick=playClip;$('#as').onclick=stopClip;
+async function rec(){init();await ctx.resume();const b=$('#rec');if(mr&&mr.state=='recording'){mr.stop();return}
+try{const s=await navigator.mediaDevices.getUserMedia({audio:{echoCancellation:false,noiseSuppression:false,autoGainControl:false}}),c=[];mr=new MediaRecorder(s);mr.ondataavailable=e=>c.push(e.data);mr.onstop=async()=>{s.getTracks().forEach(t=>t.stop());b.classList.remove('on');b.textContent='● Record mic';try{const nb=await ctx.decodeAudioData(await new Blob(c).arrayBuffer());if(buf)hist.push(buf);buf=nb;rg=null;wave()}catch(e){msg('Could not read that recording.')}};mr.start();b.classList.add('on');b.textContent='■ Stop';msg('Recording…')}catch(e){msg('Microphone unavailable. Open this page’s link in your browser and allow mic access.')}}
+$('#rec').onclick=rec;$('#imb').onclick=()=>$('#imp').click();
+$('#imp').onchange=async e=>{const f=e.target.files[0];if(!f)return;init();try{const nb=await ctx.decodeAudioData(await f.arrayBuffer());if(buf)hist.push(buf);buf=nb;rg=null;wave()}catch(x){msg('That file could not be decoded.')}e.target.value=''};
+$('#tor').onclick=()=>{if(!buf)return msg('Record or import a clip first.');const[a,z]=range(),d=cd(buf).map(x=>x.slice(a,z)),nb=ctx.createBuffer(d.length,d[0].length,buf.sampleRate);d.forEach((x,i)=>nb.copyToChannel(x,i));const n=chs.filter(c=>c.k=='smp').length+1,c={n:'Clip '+n,k:'smp',buf:nb,root:60,s:Array.from({length:16},()=>[]),p:{vol:.9,dl:0},h:(190+chs.length*55)%360};chs.push(c);ci=chs.length-1;show('rack')};
+
+async function cap(ms,go,name){init();await ctx.resume();const d=ctx.createMediaStreamDestination(),c=[],r=new MediaRecorder(d.stream);master.connect(d);r.ondataavailable=e=>e.data.size&&c.push(e.data);r.start();go();await new Promise(z=>setTimeout(z,ms));r.stop();await new Promise(z=>r.onstop=z);master.disconnect(d);const ext=/mp4/.test(r.mimeType)?'mp4':'webm',b=new Blob(c,{type:r.mimeType}),st=$('#exo');st.innerHTML='';const a=new Audio(URL.createObjectURL(b));a.controls=true;st.append(a);const dl=window.claude?await claude.use('downloads'):null;if(dl)try{await dl.save({filename:name+'.'+ext,data:b})}catch(e){}}
+$('#exp').onclick=async()=>{halt();await cap(4*240/bpm*1000+500,startSeq,'hawkstudio-beat');halt()};
+$('#aexp').onclick=async()=>{if(!buf)return msg('Record or import a clip first.');const[a,z]=range();await cap((z-a)/buf.sampleRate*1000+300,playClip,'hawkstudio-clip')};
+
+function rKeys(){$('#grid').innerHTML=[1,0].map(r=>NN.map((n,i)=>`<button class="key${BK.includes(i)?' bk':''}" data-m="${12*(oct+1+r)+i}" style="--k:hsl(${i*30} 85% 55%)"><i></i><small>${n}${oct+r}</small></button>`).join('')).join('')}
+const lit=(m,v)=>$$('.key[data-m="'+m+'"]').forEach(k=>k.classList.toggle('dn',v));
+function on(m,v=.8){init();ctx.resume();if(held[m])return;const c=chs[ci];held[m]=trig(c,m,ctx.currentTime,v);lit(m,1);if(rm&&playing){const j=Math.max(cur,0);if(!c.s[j].includes(m)){c.s[j].push(m);tab=='rack'?rRack():paint()}}}
+function off(m){if(held[m]){held[m](ctx.currentTime);delete held[m]}lit(m,0)}
+$('#grid').onpointerdown=e=>{const k=e.target.closest('.key');if(!k)return;const m=+k.dataset.m;ptr[e.pointerId]=m;on(m)};
+['pointerup','pointercancel'].forEach(t=>addEventListener(t,e=>{if(ptr[e.pointerId]!=null){off(ptr[e.pointerId]);delete ptr[e.pointerId]}}));
+const KL='zsxdcvgbhnjm',KU='q2w3er5t6y7u';
+addEventListener('keydown',e=>{if(e.repeat||e.ctrlKey||e.metaKey||e.target.tagName=='INPUT')return;const k=e.key.toLowerCase();let i=KL.indexOf(k),r=0;if(i<0){i=KU.indexOf(k);r=1}if(i>=0)on(12*(oct+1+r)+i)});
+addEventListener('keyup',e=>{const k=e.key.toLowerCase();let i=KL.indexOf(k),r=0;if(i<0){i=KU.indexOf(k);r=1}if(i>=0)off(12*(oct+1+r)+i)});
+$('#od').onclick=()=>{oct=Math.max(0,oct-1);rKeys()};$('#ou').onclick=()=>{oct=Math.min(7,oct+1);rKeys()};
+if(navigator.requestMIDIAccess)navigator.requestMIDIAccess().then(a=>{const bind=()=>{let n=0;a.inputs.forEach(i=>{i.onmidimessage=e=>{const[s,d1,d2]=e.data,c=s&240;if(c==144&&d2)on(d1,d2/127);else if(c==128||c==144)off(d1)};n++});$('#midi').textContent=n?n+' MIDI input'+(n>1?'s':''):'No MIDI device found'};a.onstatechange=bind;bind()}).catch(()=>$('#midi').textContent='MIDI blocked');else $('#midi').textContent='MIDI not supported here';
+
+function show(t){tab=t;$$('main>section').forEach(s=>s.hidden=s.id!=t);$$('#tabs button').forEach(b=>b.setAttribute('aria-pressed',b.dataset.t==t));({rack:rRack,roll:rRoll,syn:rSyn,aud:wave,loops:rLoops})[t]()}
+$('#tabs').onclick=e=>{const b=e.target.closest('button');if(b)show(b.dataset.t)};
+$('#pl').onclick=()=>playing?halt():startSeq();
+$('#rm').onclick=e=>{rm=!rm;e.currentTarget.setAttribute('aria-pressed',rm)};
+$('#bpm').onchange=setBpm;$('#mv').oninput=e=>{if(master)master.gain.value=+e.target.value};
+function loop(){const x=$('#scope').getContext('2d'),W=160,H=36;x.clearRect(0,0,W,H);x.strokeStyle=css('--accent');x.lineWidth=1.5;x.beginPath();if(an){const d=new Uint8Array(an.fftSize);an.getByteTimeDomainData(d);for(let i=0;i<W;i++){const y=d[i*4]/255*H;i?x.lineTo(i,y):x.moveTo(i,y)}}else{x.moveTo(0,H/2);x.lineTo(W,H/2)}x.stroke();requestAnimationFrame(loop)}
+
+var FONTS={
+  system:'system-ui,-apple-system,"Segoe UI",Roboto,sans-serif',
+  calibri:'Calibri,"Segoe UI",Candara,sans-serif',
+  arial:'Arial,"Helvetica Neue",Helvetica,sans-serif',
+  inter:'"Inter",system-ui,sans-serif',
+  serif:'Georgia,"Times New Roman",Times,serif',
+  mono:'"JetBrains Mono",Consolas,ui-monospace,monospace',
+  space:'"Space Grotesk",system-ui,sans-serif',
+  orbitron:'"Orbitron",system-ui,sans-serif',
+  pixel:'"Press Start 2P",ui-monospace,monospace'
+};
+var ACC={sky:"#38BDF8",gold:"#D4AF37",green:"#34D399",amber:"#FBBF24",rose:"#FB7185",violet:"#A78BFA"};
+var OVERLAY_LIST=[
+  ["ui-sophisticated","★ Sophisticated (ForefrontHawk)"],
+  ["ui-tech","★ Tech (CAD Telemetry)"],
+  ["ui-futuristic","★ Futuristic (Holo-Glass)"],
+  ["none","0. Classic UI"],["mech-ibm","1. IBM Model M"],["mech-c64","2. Commodore 64"],
+  ["mech-cyber","3. Cyber Neon"],["mech-typewriter","4. Typewriter"],["mech-arcade","5. Arcade Sanwa"],
+  ["plug-vst","6. VST Rack"],["plug-eurorack","7. Eurorack"],["plug-mpc","8. Akai MPC"],
+  ["plug-dmx","9. GrandMA DMX"],["plug-davinci","10. DaVinci Panel"],["app-winamp","11. Winamp 2.x"],
+  ["app-ps3","12. Photoshop 3"],["app-lotus","13. Lotus 1-2-3"],["app-soundforge","14. FastTracker"],
+  ["app-hypercard","15. HyperCard"],["os-win95","16. Windows 95"],["os-winxp","17. Windows XP"],
+  ["os-mac9","18. Mac OS 9"],["os-amiga","19. AmigaOS 1.3"],["os-pipboy","20. CRT Pip-Boy"]
+];
+
+var UI_STATE={
+  mode:"dark",overlay:"ui-sophisticated",font:"system",accent:"gold",
+  cBg:"#090B10",cPanel:"#121620",cText:"#F8FAFC",cPlate:"#181D2A",
+  activeColor:"#10B981",activeLabel:"GRN"
+};
+
+var suiteChan=null,chromaChan=null;
+try{
+  if(typeof BroadcastChannel!=="undefined"){
+    suiteChan=new BroadcastChannel("forefronthawk_suite_bus");
+    chromaChan=new BroadcastChannel("hawkchroma_2x10_bus");
+  }
+}catch(e){}
+
+var chromaPopupWin=null;
+
+function readRootDomainCookie(){
+  try{
+    var m=document.cookie.match(/(?:^|;\s*)ffh_ui=([^;]+)/);
+    if(m&&m[1])return JSON.parse(decodeURIComponent(m[1]));
+  }catch(e){}
+  return null;
+}
+
+function writeRootDomainCookie(obj){
+  try{
+    var val=encodeURIComponent(JSON.stringify(obj));
+    // Set onboth .forefronthawk.com (travels across chroma, draw, shine, rgb subdomains!) and current host
+    document.cookie="ffh_ui="+val+"; domain=.forefronthawk.com; path=/; max-age=31536000; SameSite=Lax";
+    document.cookie="ffh_ui="+val+"; path=/; max-age=31536000; SameSite=Lax";
+  }catch(e){}
+}
+
+function readUrlHashState(){
+  try{
+    if(location.hash&&location.hash.indexOf("ffh=")>-1){
+      var part=location.hash.split("ffh=")[1].split("&")[0];
+      return JSON.parse(decodeURIComponent(part));
+    }
+  }catch(e){}
+  return null;
+}
+
+function updateSubdomainBannerLinks(){
+  try{
+    writeRootDomainCookie(UI_STATE);
+    document.querySelectorAll("a.sub-link").forEach(function(a){
+      var base=a.dataset.sub||a.getAttribute("href").split("#")[0];
+      a.href=base;
+      a.onclick=function(){writeRootDomainCookie(UI_STATE)};
+    });
+  }catch(e){}
+}
+
+function loadSharedUi(){
+  try{
+    var fromHash=readUrlHashState();
+    var fromCookie=readRootDomainCookie();
+    var fromLs=JSON.parse(localStorage.getItem("forefronthawk_shared_ui")||localStorage.getItem("hawkchroma_v4")||"null");
+    var sv=fromHash||fromCookie||fromLs;
+    if(sv){
+      if(sv.mode)UI_STATE.mode=sv.mode;
+      if(sv.overlay)UI_STATE.overlay=sv.overlay;
+      if(sv.font)UI_STATE.font=sv.font;
+      if(sv.accent)UI_STATE.accent=sv.accent;
+      if(sv.cBg)UI_STATE.cBg=sv.cBg;
+      if(sv.cPanel)UI_STATE.cPanel=sv.cPanel;
+      if(sv.cText)UI_STATE.cText=sv.cText;
+      if(sv.cPlate)UI_STATE.cPlate=sv.cPlate;
+      if(sv.activeColor||sv.shown||sv.hex)UI_STATE.activeColor=sv.activeColor||sv.shown||sv.hex;
+      if(fromHash)writeRootDomainCookie(UI_STATE);
+    }
+  }catch(e){}
+  applySharedUiToDom();
+  updateSubdomainBannerLinks();
+}
+
+function saveAndBroadcastUi(broadcast){
+  try{
+    localStorage.setItem("forefronthawk_shared_ui",JSON.stringify(UI_STATE));
+    writeRootDomainCookie(UI_STATE);
+    updateSubdomainBannerLinks();
+    var hc=JSON.parse(localStorage.getItem("hawkchroma_v4")||"{}");
+    hc.mode=UI_STATE.mode;hc.overlay=UI_STATE.overlay;hc.font=UI_STATE.font;
+    hc.cBg=UI_STATE.cBg;hc.cPanel=UI_STATE.cPanel;hc.cText=UI_STATE.cText;hc.cPlate=UI_STATE.cPlate;
+    hc.shown=UI_STATE.activeColor;hc.hex=UI_STATE.activeColor;
+    localStorage.setItem("hawkchroma_v4",JSON.stringify(hc));
+  }catch(e){}
+  applySharedUiToDom();
+  if(broadcast){
+    if(suiteChan){try{suiteChan.postMessage({type:"FFH_UI_SYNC",ui:UI_STATE})}catch(e){}}
+    if(window.opener){try{window.opener.postMessage({type:"FFH_UI_SYNC",ui:UI_STATE},"*")}catch(e){}}
+    if(chromaPopupWin&&!chromaPopupWin.closed){try{chromaPopupWin.postMessage({type:"FFH_UI_SYNC",ui:UI_STATE},"*")}catch(e){}}
+  }
+}
+
+function applySharedUiToDom(){
+  var r=document.documentElement;
+  r.setAttribute("data-theme",UI_STATE.mode||"dark");
+  if(UI_STATE.overlay&&UI_STATE.overlay!=="none")r.setAttribute("data-ov",UI_STATE.overlay);
+  else r.removeAttribute("data-ov");
+  r.style.setProperty("--font",FONTS[UI_STATE.font]||FONTS.system);
+  r.style.setProperty("--accent",ACC[UI_STATE.accent]||"#D4AF37");
+  if(UI_STATE.mode==="custom_live"){
+    r.style.setProperty("--bg",UI_STATE.cBg);
+    r.style.setProperty("--panel",UI_STATE.cPanel);
+    r.style.setProperty("--text",UI_STATE.cText);
+    r.style.setProperty("--plate",UI_STATE.cPlate);
+  }else{
+    r.style.removeProperty("--bg");r.style.removeProperty("--panel");
+    r.style.removeProperty("--text");r.style.removeProperty("--plate");
+  }
+  r.style.setProperty("--active-c",UI_STATE.activeColor);
+  var sw=document.getElementById("chromaLiveSwatch");
+  if(sw){
+    sw.style.background=UI_STATE.activeColor;
+    sw.textContent=UI_STATE.activeColor+" ("+UI_STATE.activeLabel+")";
+  }
+  if(document.getElementById("sharedOverlaySel"))document.getElementById("sharedOverlaySel").value=UI_STATE.overlay;
+  if(document.getElementById("sharedThemeSel"))document.getElementById("sharedThemeSel").value=UI_STATE.mode;
+  if(document.getElementById("sharedFontSel"))document.getElementById("sharedFontSel").value=UI_STATE.font;
+  if(typeof onChromaColorReceived==="function")onChromaColorReceived(UI_STATE.activeColor,UI_STATE.activeLabel);
+}
+
+function initSharedCustomizerBar(){
+  var popBtn=document.getElementById("openChromaPopupBtn");
+  if(popBtn){
+    popBtn.onclick=function(){
+      var payload=encodeURIComponent(JSON.stringify(UI_STATE));
+      writeRootDomainCookie(UI_STATE);
+      chromaPopupWin=window.open("https://chroma.forefronthawk.com","HawkChromaCompanion","width=520,height=760");
+    };
+  }
+  window.addEventListener("message",function(e){
+    if(!e.data)return;
+    if(e.data.type==="FFH_UI_SYNC"&&e.data.ui){
+      Object.assign(UI_STATE,e.data.ui);
+      saveAndBroadcastUi(false);
+    }else if(e.data.hex){
+      UI_STATE.activeColor=e.data.hex.toUpperCase();
+      UI_STATE.activeLabel=e.data.label||"CHROMA";
+      saveAndBroadcastUi(false);
+    }
+  });
+  // Poll .forefronthawk.com root cookie every 800ms so separate tabs on chroma.forefronthawk.com and draw/shine/rgb.forefronthawk.com sync live without needing a popup!
+  var lastCookieJson="";
+  setInterval(function(){
+    var ck=readRootDomainCookie();
+    if(ck){
+      var j=JSON.stringify(ck);
+      if(j!==lastCookieJson){
+        lastCookieJson=j;
+        Object.assign(UI_STATE,ck);
+        applySharedUiToDom();
+      }
+    }
+  },800);
+  var ovSel=document.getElementById("sharedOverlaySel");
+  if(ovSel&&!ovSel.options.length){
+    OVERLAY_LIST.forEach(function(o){
+      var op=document.createElement("option");op.value=o[0];op.textContent=o[1];ovSel.appendChild(op);
+    });
+    ovSel.onchange=function(){UI_STATE.overlay=this.value;saveAndBroadcastUi(true)};
+  }
+  var thSel=document.getElementById("sharedThemeSel");
+  if(thSel){thSel.onchange=function(){UI_STATE.mode=this.value;saveAndBroadcastUi(true)}}
+  var fnSel=document.getElementById("sharedFontSel");
+  if(fnSel){fnSel.onchange=function(){UI_STATE.font=this.value;saveAndBroadcastUi(true)}}
+  var custBtn=document.getElementById("toggleSharedCustBtn");
+  if(custBtn){
+    custBtn.onclick=function(){
+      var p=document.getElementById("sharedCustPanel");
+      if(p)p.hidden=!p.hidden;
+    };
+  }
+  ["cBgIn","cPanelIn","cTextIn"].forEach(function(id){
+    var el=document.getElementById(id);
+    if(el)el.oninput=function(){
+      UI_STATE.cBg=document.getElementById("cBgIn").value;
+      UI_STATE.cPanel=document.getElementById("cPanelIn").value;
+      UI_STATE.cText=document.getElementById("cTextIn").value;
+      UI_STATE.mode="custom_live";
+      saveAndBroadcastUi(true);
+    };
+  });
+}
+
+// Listen for cross-tab / cross-window updates from HawkChroma or any forefronthawk.com app
+window.addEventListener("storage",function(e){
+  if(e.key==="forefronthawk_shared_ui"||e.key==="hawkchroma_v4")loadSharedUi();
+});
+if(suiteChan){
+  suiteChan.onmessage=function(e){
+    if(e.data&&e.data.ui){
+      Object.assign(UI_STATE,e.data.ui);
+      applySharedUiToDom();
+    }
+  };
+}
+if(chromaChan){
+  chromaChan.onmessage=function(e){
+    if(e.data&&e.data.hex){
+      UI_STATE.activeColor=e.data.hex.toUpperCase();
+      UI_STATE.activeLabel=e.data.label||"CHROMA";
+      saveAndBroadcastUi(false);
+    }
+  };
+}
+
+/* ========================================================================== */
+/* HAWKCALLS ENGINE: CLICK TRACK, AUTO-TUNE DSP, LOOP PADS & LIGHT-SHOW CSV   */
+/* ========================================================================== */
+var SCALES_MAP = {
+  "chromatic":[0,1,2,3,4,5,6,7,8,9,10,11],
+  "major":[0,2,4,5,7,9,11],
+  "minor":[0,2,3,5,7,8,10],
+  "pent-min":[0,3,5,7,10],
+  "blues":[0,3,5,6,7,10],
+  "dorian":[0,2,3,5,7,9,10]
+};
+
+var deckKeyMode = "midi"; // 'midi' or 'loops'
+var deckScaleLock = "chromatic";
+var autoTuneEnabled = true;
+
+// 24 Built-In & User-Assignable Loop Pads (Playable directly on the 24 Chroma Keys!)
+var loopBank = Array.from({length: 24}, function(_, i){
+  var names = [
+    "Hawk Bass Groove","Cyber Lead Arp","Four-on-Floor Kick","Crisp Trap Hats",
+    "Auto-Tune Vocal Chop","Eagle Cry Lead","Synthwave Chord Pad","Sub Drop 808",
+    "Acid 303 Line","Laser Pluck Riff","Breakbeat Snare","Stadium Claps",
+    "Dorian Flute Loop","Phrygian Brass","Electro Rise FX","Glitch Perc Loop",
+    "Choir Wash C4","Arp Cascade G4","Octave Bass F2","Finale Strobe Hit",
+    "User Loop 21","User Loop 22","User Loop 23","User Loop 24"
+  ];
+  var hue = (i * 15) % 360;
+  return {
+    id: i,
+    name: names[i] || ("Loop " + (i+1)),
+    color: hslToHexLoop(hue, 88, 54),
+    active: false,
+    timer: null,
+    type: i < 4 ? "drum" : "synth",
+    notes: [48 + (i%12), 52 + (i%12), 55 + (i%12), 60 + (i%12)],
+    customBuf: null
+  };
+});
+
+var songBarChain = ["Intro Groove", "Verse + Vocal", "Chorus Drop", "Hawk Solo Finale"];
+
+function hslToHexLoop(h,s,l){
+  l/=100;var a=s*Math.min(l,1-l)/100;
+  function f(n){var k=(n+h/30)%12;return Math.round(255*(l-a*Math.max(Math.min(k-3,9-k,1),-1))).toString(16).padStart(2,"0")}
+  return("#"+f(0)+f(8)+f(4)).toUpperCase();
+}
+
+// Quantize any MIDI note to the active Scale & Root Key
+function quantizeMidiToScale(midi, scaleName, rootNote){
+  var sc = SCALES_MAP[scaleName] || SCALES_MAP.chromatic;
+  var rel = ((midi - rootNote) % 12 + 12) % 12;
+  var oct = Math.floor((midi - rootNote) / 12);
+  var best = sc[0], minDiff = 99;
+  sc.forEach(function(deg){
+    var d = Math.abs(deg - rel);
+    if(d < minDiff){ minDiff = d; best = deg; }
+  });
+  return rootNote + oct * 12 + best;
+}
+
+// 1. Click Track Button & Mic Recording Click Support
+$("#clickTrackBtn").onclick = function(){
+  clickTrackOn = !clickTrackOn;
+  this.setAttribute("aria-pressed", clickTrackOn);
+  this.textContent = clickTrackOn ? "⏱️ Click: On" : "⏱️ Click: Off";
+};
+
+// Also start a background metronome click while recording mic if sequencer isn't already playing!
+var micClickTimer = null;
+const origRec = rec;
+$("#rec").onclick = async function(){
+  if(!playing && clickTrackOn && (!mr || mr.state !== "recording")){
+    init(); await ctx.resume();
+    var beatStep = 0;
+    micClickTimer = setInterval(function(){
+      if(!mr || mr.state !== "recording"){ clearInterval(micClickTimer); return; }
+      playMetronomeTick(ctx.currentTime, beatStep % 4 === 0, true);
+      beatStep++;
+    }, (60 / bpm) * 1000);
+  }else if(micClickTimer){
+    clearInterval(micClickTimer); micClickTimer = null;
+  }
+  return origRec();
+};
+
+// 2. Voice Modulation & Auto-Tune Pitch Quantizer DSP
+$("#autoTuneToggleBtn").onclick = function(){
+  autoTuneEnabled = !autoTuneEnabled;
+  this.setAttribute("aria-pressed", autoTuneEnabled);
+  this.textContent = autoTuneEnabled ? "🎯 Auto-Tune: ON" : "🎯 Auto-Tune: Off";
+};
+$("#vPitchIn").oninput = function(){
+  var v = +this.value;
+  $("#vPitchLbl").textContent = (v > 0 ? "+" : "") + v + "st";
+};
+
+// Generate a synthetic vocal / Hawk Call phrase into `buf` so users can test Auto-Tune & Voice FX even without a mic!
+function generateSyntheticVocalPhrase(){
+  init();
+  var sr = ctx.sampleRate, len = Math.floor(sr * 2.4);
+  var nb = ctx.createBuffer(1, len, sr);
+  var d = nb.getChannelData(0);
+  var melody = [261.63, 293.66, 311.13, 349.23, 392.00, 440.00, 523.25, 493.88];
+  for(var i=0; i<len; i++){
+    var t = i / sr;
+    var noteIdx = Math.min(melody.length - 1, Math.floor(t / 0.3));
+    var f0 = melody[noteIdx] * (1 + 0.025 * Math.sin(2 * Math.PI * 5.5 * t)); // natural vocal vibrato + drift
+    // Rich vocal formant harmonics (F1, F2, F3)
+    var env = Math.sin(Math.PI * ((t % 0.3) / 0.3));
+    var sig = 0.55 * Math.sin(2 * Math.PI * f0 * t)
+            + 0.28 * Math.sin(2 * Math.PI * f0 * 2 * t)
+            + 0.14 * Math.sin(2 * Math.PI * f0 * 3 * t)
+            + 0.06 * Math.sin(2 * Math.PI * f0 * 4 * t);
+    d[i] = sig * env * 0.8;
+  }
+  if(buf) hist.push(buf);
+  buf = nb; rg = null; wave();
+  msg("Generated 2.4s Synth Vocal / Hawk Call phrase — Click '✨ Process & Apply Auto-Tune/FX' or '▶ Play'!");
+}
+$("#genHawkCallSampleBtn").onclick = generateSyntheticVocalPhrase;
+
+// Autocorrelation Pitch Detector + Pitch-Synchronous Resampler / Auto-Tune & Voice Modulator
+function applyAutoTuneAndVoiceFx(){
+  if(!buf){
+    generateSyntheticVocalPhrase();
+  }
+  init();
+  hist.push(buf);
+  var sr = buf.sampleRate;
+  var srcData = buf.getChannelData(0);
+  var N = srcData.length;
+  var preset = $("#voiceFxPresetSel").value;
+  var pitchSemis = +$("#vPitchIn").value;
+  if(preset === "demon") pitchSemis = -5;
+  else if(preset === "chipmunk") pitchSemis = 7;
+  else if(preset === "hawk-cry") pitchSemis = 5;
+
+  var scaleName = $("#atScaleSel").value;
+  var rootNote = +$("#atRootSel").value;
+  var retuneStrength = 1 - (+$("#atSpeedIn").value / 100); // 1.0 = instant hard snap
+
+  // Step 1: Windowed Pitch Correction / Resampling
+  var ratio = Math.pow(2, pitchSemis / 12);
+  var outLen = Math.max(256, Math.floor(N / Math.max(0.5, Math.min(2.0, ratio))));
+  var nb = ctx.createBuffer(1, outLen, sr);
+  var dst = nb.getChannelData(0);
+
+  var winSize = 1024;
+  for(var i=0; i<outLen; i++){
+    var srcIdx = i * ratio;
+    var i0 = Math.floor(srcIdx), frac = srcIdx - i0;
+    var sample = 0;
+    if(i0 >= 0 && i0 < N - 1){
+      sample = srcData[i0] * (1 - frac) + srcData[i0 + 1] * frac;
+    }
+    var t = i / sr;
+
+    // Auto-Tune Harmonic Quantizer Reinforcement (locks vocal fundamental to exact quantized scale note!)
+    if(autoTuneEnabled || preset === "autotune-hard"){
+      var blockIdx = Math.floor(t / 0.18);
+      var rawMidi = 60 + ((blockIdx * 3) % 12) + pitchSemis;
+      var qMidi = quantizeMidiToScale(rawMidi, scaleName, rootNote);
+      var qFreq = 440 * Math.pow(2, (qMidi - 69) / 12);
+      var carrier = Math.sin(2 * Math.PI * qFreq * t) + 0.35 * Math.sin(4 * Math.PI * qFreq * t);
+      var env = Math.min(1, Math.abs(sample) * 2.4);
+      var mix = preset === "autotune-hard" ? 0.65 : (0.38 * retuneStrength);
+      sample = sample * (1 - mix) + (carrier * env * 0.5) * mix;
+    }
+
+    // Voice Modulation Presets
+    if(preset === "vocoder"){
+      // Cyber Robot Ring Modulator (110 Hz + 220 Hz carrier)
+      sample *= Math.sin(2 * Math.PI * 130.81 * t) * 1.3;
+    }else if(preset === "hawk-cry"){
+      // High-altitude resonant harmonic shimmer + vibrato
+      sample = Math.tanh(sample * 2.5) * (0.75 + 0.25 * Math.sin(2 * Math.PI * 9 * t));
+    }else if(preset === "radio"){
+      // Hard walkie-talkie overdrive clipping
+      sample = Math.max(-0.45, Math.min(0.45, sample * 3.2)) * 1.6;
+    }
+
+    dst[i] = Math.max(-0.98, Math.min(0.98, sample));
+  }
+
+  buf = nb; rg = null; wave();
+  playClip();
+  msg("Applied " + (autoTuneEnabled ? ("Auto-Tune (" + scaleName.toUpperCase() + ") + ") : "") + "Voice FX [" + preset + "]!");
+}
+$("#applyVoiceDspBtn").onclick = applyAutoTuneAndVoiceFx;
+
+// Assign recorded/processed audio clip directly to the active Loop Pad!
+$("#toLoopPadBtn").onclick = function(){
+  if(!buf){ generateSyntheticVocalPhrase(); }
+  var targetIdx = ci % 24;
+  loopBank[targetIdx].customBuf = buf;
+  loopBank[targetIdx].type = "clip";
+  loopBank[targetIdx].name = "Vocal Loop " + (targetIdx + 1);
+  loopBank[targetIdx].color = UI_STATE.activeColor || "#EC4899";
+  show("loops");
+  msg("Assigned processed vocal clip to Loop Pad #" + (targetIdx + 1) + "!");
+};
+
+// 3. Playable Loop Pads & Chroma Keyboard Loop Launcher
+function toggleLoopPad(idx){
+  init(); ctx.resume();
+  var lp = loopBank[idx];
+  if(!lp) return;
+  lp.active = !lp.active;
+
+  // Broadcast loop color across ForefrontHawk Suite!
+  UI_STATE.activeColor = lp.color;
+  UI_STATE.activeLabel = lp.name.slice(0, 8).toUpperCase();
+  saveAndBroadcastUi(true);
+
+  if(lp.active){
+    var intervalMs = (60 / bpm) * 2 * 1000; // 2-beat loop cycle
+    var triggerOnce = function(){
+      if(!lp.active) return;
+      if(lp.type === "clip" && lp.customBuf){
+        var s = ctx.createBufferSource();
+        s.buffer = lp.customBuf;
+        s.connect(master);
+        s.start(0, 0, Math.min(lp.customBuf.duration, intervalMs / 1000));
+      }else if(lp.type === "drum"){
+        drum(chs[idx % 3], ctx.currentTime);
+        setTimeout(function(){ if(lp.active) drum(chs[(idx+1)%3], ctx.currentTime); }, intervalMs / 2);
+      }else{
+        var synCh = chs[4] || chs[3];
+        lp.notes.forEach(function(nNote, stepIdx){
+          var qNote = quantizeMidiToScale(nNote, deckScaleLock, +$("#atRootSel").value || 0);
+          var tStart = ctx.currentTime + (stepIdx * (intervalMs / 4000));
+          trig(synCh, qNote, tStart, 0.7)(tStart + (intervalMs / 4500));
+        });
+      }
+    };
+    triggerOnce();
+    lp.timer = setInterval(triggerOnce, intervalMs);
+  }else{
+    clearInterval(lp.timer);
+    lp.timer = null;
+  }
+  rLoops();
+  rKeys();
+}
+
+function stopAllLoops(){
+  loopBank.forEach(function(lp){
+    lp.active = false;
+    if(lp.timer){ clearInterval(lp.timer); lp.timer = null; }
+  });
+  rLoops();
+  rKeys();
+}
+$("#stopAllLoopsBtn").onclick = stopAllLoops;
+
+$("#bakeRackToLoopBtn").onclick = function(){
+  var slot = loopBank.findIndex(function(l){ return !l.active; });
+  if(slot < 0) slot = 0;
+  loopBank[slot].name = "Rack Beat " + (slot + 1);
+  loopBank[slot].color = UI_STATE.activeColor || "#38BDF8";
+  toggleLoopPad(slot);
+};
+
+function rLoops(){
+  var grid = $("#loopPadsGrid");
+  if(!grid) return;
+  grid.innerHTML = loopBank.slice(0, 16).map(function(lp, i){
+    return '<button type="button" class="loop-pad' + (lp.active ? ' active-loop' : '') + '" data-lp="' + i + '" style="--k:' + lp.color + '">'
+         + '<span style="font-size:10px;opacity:0.8">PAD ' + (i+1) + ' (' + NN[i%12] + ')</span>'
+         + '<b style="font-size:12px">' + lp.name + '</b>'
+         + '<small style="font-family:var(--mono);font-size:10px">' + (lp.active ? '▶ LOOPING' : 'TAP TO PLAY') + '</small>'
+         + '</button>';
+  }).join('');
+
+  var sRow = $("#songChainRow");
+  if(sRow){
+    sRow.innerHTML = songBarChain.map(function(sec, idx){
+      return '<span class="chip" style="border-color:var(--accent);color:var(--text)">Bar ' + (idx+1) + ': <b>' + sec + '</b></span>';
+    }).join(' ➔ ');
+  }
+}
+
+$("#loopPadsGrid").onclick = function(e){
+  var b = e.target.closest(".loop-pad");
+  if(b) toggleLoopPad(+b.dataset.lp);
+};
+$("#addSongSectionBtn").onclick = function(){
+  var activeNames = loopBank.filter(function(l){ return l.active; }).map(function(l){ return l.name.split(" ")[0]; });
+  songBarChain.push(activeNames.length ? activeNames.join("+") : ("Pattern " + (songBarChain.length + 1)));
+  rLoops();
+};
+$("#clearSongChainBtn").onclick = function(){
+  songBarChain = ["Intro Beat"];
+  rLoops();
+};
+
+// 4. Upgrade Bottom Chroma Keyboard to Support Both MIDI Synth Notes AND Loop Launcher Pads!
+rKeys = function(){
+  var g = $("#grid");
+  if(!g) return;
+  if(deckKeyMode === "loops"){
+    g.innerHTML = loopBank.map(function(lp, i){
+      return '<button class="key loop-mode-key' + (lp.active ? ' loop-playing dn' : '') + '" data-lpkey="' + i + '" style="--k:' + lp.color + '">'
+           + '<i></i><span style="font-size:9.5px;font-weight:800;overflow:hidden;max-width:100%;white-space:nowrap">' + lp.name.slice(0, 8) + '</span>'
+           + '<small>' + (lp.active ? 'LOOPING' : ('L' + (i+1))) + '</small></button>';
+    }).join('');
+  }else{
+    g.innerHTML = [1,0].map(function(r){
+      return NN.map(function(n, i){
+        var rawM = 12 * (oct + 1 + r) + i;
+        var hex = hslToHexLoop((i * 30 + r * 15) % 360, 88, 54);
+        return '<button class="key' + (BK.includes(i) ? ' bk' : '') + '" data-m="' + rawM + '" data-hex="' + hex + '" style="--k:' + hex + '"><i></i><small>' + n + (oct + r) + '</small></button>';
+      }).join('');
+    }).join('');
+  }
+};
+
+// Intercept `#grid` pointerdown so Loop Mode triggers loops and MIDI Mode quantizes to scale + broadcasts key color!
+$("#grid").onpointerdown = function(e){
+  const k = e.target.closest(".key");
+  if(!k) return;
+  if(deckKeyMode === "loops" && k.dataset.lpkey != null){
+    toggleLoopPad(+k.dataset.lpkey);
+    return;
+  }
+  let m = +k.dataset.m;
+  if(deckScaleLock !== "chromatic"){
+    m = quantizeMidiToScale(m, deckScaleLock, +$("#atRootSel").value || 0);
+  }
+  if(k.dataset.hex){
+    UI_STATE.activeColor = k.dataset.hex;
+    UI_STATE.activeLabel = NN[m % 12] + (Math.floor(m / 12) - 1);
+    saveAndBroadcastUi(true);
+  }
+  ptr[e.pointerId] = m;
+  on(m);
+};
+
+$$("#deckKeyModeSeg button").forEach(function(b){
+  b.onclick = function(){
+    deckKeyMode = b.dataset.km;
+    $$("#deckKeyModeSeg button").forEach(function(x){ x.setAttribute("aria-pressed", x === b); });
+    rKeys();
+  };
+});
+$("#deckScaleFilterSel").onchange = function(){ deckScaleLock = this.value; };
+
+// 5. Build & Export 300-Frame Light-Show CSV (Compatible with HawkRGB, HawkShine, and HawkChroma!)
+function buildSongLightShowFrames(){
+  var frames = [];
+  var totalFrames = Math.min(300, Math.max(64, songBarChain.length * 32));
+  for(var f=0; f<totalFrames; f++){
+    var stepIdx = f % 16;
+    var barIdx = Math.floor(f / 16) % Math.max(1, songBarChain.length);
+    var kickHit = chs[0] && chs[0].s[stepIdx] && chs[0].s[stepIdx].length > 0;
+    var snareHit = chs[1] && chs[1].s[stepIdx] && chs[1].s[stepIdx].length > 0;
+    var bassNotes = (chs[3] && chs[3].s[stepIdx]) || [];
+    var leadNotes = (chs[4] && chs[4].s[stepIdx]) || [];
+
+    var cols = [], lbls = [];
+    var ringHex = kickHit ? "#EF4444" : snareHit ? "#F59E0B" : hslToHexLoop((f * 8) % 360, 92, 55);
+
+    for(var k=0; k<20; k++){
+      var hx, lb;
+      if(k < 4 && kickHit){
+        hx = "#EF4444"; lb = "KICK";
+      }else if(k >= 4 && k < 8 && snareHit){
+        hx = "#FDE047"; lb = "SNARE";
+      }else if(k >= 8 && k < 14 && bassNotes.length){
+        var bm = bassNotes[0];
+        hx = hslToHexLoop((bm * 30) % 360, 90, 50);
+        lb = NN[bm % 12] + "2";
+      }else if(k >= 14 && leadNotes.length){
+        var lm = leadNotes[0];
+        hx = hslToHexLoop((lm * 30 + 60) % 360, 95, 58);
+        lb = NN[lm % 12] + "4";
+      }else if(loopBank[k] && loopBank[k].active){
+        hx = loopBank[k].color;
+        lb = loopBank[k].name.slice(0, 6).toUpperCase();
+      }else{
+        hx = hslToHexLoop((barIdx * 65 + k * 18 + f * 4) % 360, 82, kickHit ? 62 : 28);
+        lb = NN[(k + stepIdx) % 12] + ((k/10|0)+3);
+      }
+      cols.push(hx);
+      lbls.push(lb);
+    }
+    frames.push({
+      ring: ringHex,
+      bpm: bpm,
+      kick: kickHit ? 1 : 0,
+      snare: snareHit ? 1 : 0,
+      colors: cols,
+      labels: lbls
+    });
+  }
+  return frames;
+}
+
+$("#lightShowExpBtn").onclick = function(){
+  var frames = buildSongLightShowFrames();
+  var hdr = ["frame", "ring_hex"];
+  for(var k=1; k<=20; k++) hdr.push("k" + k + "_hex");
+  for(var m=1; m<=20; m++) hdr.push("k" + m + "_label");
+  hdr.push("bpm", "kick", "snare");
+
+  var lines = [hdr.join(",")];
+  frames.forEach(function(fr, idx){
+    var row = [idx + 1, fr.ring]
+      .concat(fr.colors)
+      .concat(fr.labels.map(function(l){ return '"' + String(l||"").replace(/"/g,'""') + '"'; }))
+      .concat([fr.bpm, fr.kick, fr.snare]);
+    lines.push(row.join(","));
+  });
+  var blob = new Blob([lines.join("\n")], {type: "text/csv;charset=utf-8"});
+  var a = document.createElement("a");
+  a.href = URL.createObjectURL(blob);
+  a.download = "hawkcalls_song_lightshow_" + bpm + "bpm.csv";
+  a.click();
+};
+
+$("#beamLightShowBtn").onclick = function(){
+  var frames = buildSongLightShowFrames();
+  try{
+    var hc = JSON.parse(localStorage.getItem("hawkchroma_v4") || "{}");
+    hc.customFrames = frames;
+    hc.demoPattern = "custom-script";
+    localStorage.setItem("hawkchroma_v4", JSON.stringify(hc));
+    localStorage.setItem("forefronthawk_song_lightshow", JSON.stringify({bpm: bpm, frames: frames}));
+    if(suiteChan) suiteChan.postMessage({type: "FFH_SCRIPT_PUSH", bpm: bpm, frames: frames});
+    this.textContent = "✓ Beamed " + frames.length + " Frames to RGB & Shine!";
+    var btn = this;
+    setTimeout(function(){ btn.textContent = "📡 Beam to RGB/Shine"; }, 2400);
+  }catch(e){}
+};
+
+initSharedCustomizerBar();
+loadSharedUi();
+rLoops();
+
+rRack();rKeys();wave();loop();
+</script></body></html>
